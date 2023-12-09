@@ -1,0 +1,75 @@
+﻿
+@{
+    ViewBag.Title = "ReportePorFecha";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-white text-center">Reporte Por Fecha</h2>
+
+
+@if (ViewBag.message != null)
+{
+    <h1 class="text-danger text-center">@ViewBag.message</h1>
+}
+
+@using (Html.BeginForm("ReporteFacturas", "Facturacion", FormMethod.Post, new { target = "_blank", onsubmit = "return validateForm();" }))
+{
+
+    <div class="container">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="col-sm-3">
+                <div class="text-center">
+                    <!-- Centrar el texto -->
+                    <span class="text-white">Fecha inicio</span>
+                </div>
+                <div class="h-25">
+                    @(Html.DevExtreme().
+                   Calendar().Min(DateTime.Now.AddMonths(-3)).Max(DateTime.Now)
+                   .ID("txtFiltro1")
+                   .Name("txtFiltro1"))
+                </div>
+            </div>
+
+            <div class="ml-5 col-sm-3">
+                <div class="text-center">
+                    <!-- Centrar el texto -->
+                    <span class="text-white">Fecha Fin</span>
+                </div>
+                <div class="h-25">
+                    @(Html.DevExtreme().
+                   Calendar().Min(DateTime.Now.AddMonths(-3)).Max(DateTime.Now)
+                   .ID("txtFiltro2")
+                   .Name("txtFiltro2"))
+                </div>
+            </div>
+        </div>
+        <div class="row text-right text-white">
+            <div class="col-sm h-25">
+                @(Html.DevExtreme().
+                Button().
+                Text("Consultar").
+                UseSubmitBehavior(true).
+                Type(ButtonType.Success))
+            </div>
+        </div>
+    </div>
+    <br>
+
+}
+
+
+
+<script type="text/javascript">
+
+    function validateForm() {
+        var input = $('#txtFiltro1').dxTextBox('instance').option('value');
+        var input2 = $('#txtFiltro2').dxTextBox('instance').option('value');
+        if (input == "" || input2 == "") {
+            return false;
+        } else {
+
+            return true;
+        }
+    }
+
+</script>

@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error 404 - Página no encontrada</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Personaliza el estilo si es necesario */
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+        }
+
+        .error-container {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="error-container">
+        <h1 class="display-4 text-white">Error de la aplicacion</h1>
+        <p class="lead text-danger">Error</p>
+        <p class="text-white">Lo sentimos, Ha ocurrrido un Error porfavor comuniquese con el administrado o soporte de TI para solucionar el problema.</p>
+        <a href="@Url.Action("logout","Acceso")" class="btn btn-primary">Volver a la página principal</a>
+    </div>
+
+    <!-- Bootstrap JS y dependencias -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

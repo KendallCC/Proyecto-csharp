@@ -1,0 +1,138 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-white text-center">Facturacion</h2>
+@(Html.DevExtreme().DataGrid<Proyecto.Models.Factura>()
+    .ID("gridContainer")
+    .DataSource(d => d.WebApi()
+    .RouteName("Factura")
+    .LoadAction("Listar")
+    .Key("IDFactura")
+    .OnBeforeSend("beforeSend")
+    )
+    .ShowBorders(true)
+    .OnInitialized("onLoading")
+    .RepaintChangesOnly(true)
+    .Paging(p => p.PageSize(5))
+    .Pager(pager =>
+    {
+        pager.Visible(true);
+        pager.ShowPageSizeSelector(true);
+        pager.AllowedPageSizes(new JS("[5, 10, 25, 50, 'all']"));
+        pager.ShowInfo(true);
+        pager.ShowNavigationButtons(true);
+    })
+    .FilterRow(f => f.Visible(true))
+    .SearchPanel(searchPanel => searchPanel.Visible(true))
+    .ColumnHidingEnabled(true)
+    .HeaderFilter(f => f.Visible(true))
+    .GroupPanel(p => p.Visible(true))
+    .Grouping(g => g.AutoExpandAll(false))
+    .RemoteOperations(true)
+    //.Scrolling(s => s.Mode(GridScrollingMode.Virtual))
+    .Editing(e => e
+    .Mode(GridEditMode.Popup)
+    .RefreshMode(GridEditRefreshMode.Reshape)
+    .UseIcons(true)
+    )
+    .Columns(columns =>
+    {
+        columns.AddFor(m => m.IDFactura).Caption("Nº factura").Alignment(HorizontalAlignment.Center);
+        columns.AddFor(m => m.FechaFactura).Caption("Fecha de Factura").Alignment(HorizontalAlignment.Center);
+        columns.AddFor(m => m.DetallesFactura).Caption("Detalle").Alignment(HorizontalAlignment.Center);
+        columns.AddFor(m => m.Pedido.Usuario.Nombre).Caption("Usuario").Alignment(HorizontalAlignment.Center);
+    })
+    .Export(e => e.Enabled(true).AllowExportSelectedData(true))
+    .OnExporting("exportToPDF")
+    .Selection(s => s.Mode(SelectionMode.Multiple))
+    .MasterDetail(md => {
+    md.Enabled(true);
+    md.Template(@<text>
+            <div class="master-detail-caption">Detalle de la factura <%- data.IDFactura %> del Usuario <%- data.Pedido.Usuario.Nombre %></div>
+            @(Html.DevExtreme().DataGrid<Proyecto.Models.Pedido>()
+                .ColumnAutoWidth(true)
+                .ShowBorders(true)
+                .Columns(columns => {
+                    columns.AddFor(m => m.IDPedido).Alignment(HorizontalAlignment.Center);
+                    columns.AddFor(m => m.EstadoPedido.Detalle).Caption("Estado del Pedido").Alignment(HorizontalAlignment.Center);
+
+                })
+                .DataSource(d => d.WebApi()
+                    .RouteName("Pedidos")
+                    .LoadAction("Listarporusuario")
+                    .LoadParams(new { idUsuario = new JS("data.Pedido.Usuario.IDUsuario") })
+                )
+            )
+        </text>);
+    })
+
+
+    )
+
+
+
+
+
+<script>
+
+    function onLoading(e) {
+        Swal.fire({
+            title: 'Atención',
+            text: 'Cargando Facturas',
+            icon: 'success',
+            timerProgressBar: true,
+            showConfirmButton: false,
+            position: 'Center',
+            timer: 1000
+        });
+    }
+
+    function beforeSend(operation, ajaxSettings) {
+        var data = ajaxSettings.data || {},
+            args = Object.keys(data).map(function (key) {
+                return key + "=" + data[key];
+            }).join(" ");
+
+        var logList = $("#requests ul"),
+            time = DevExpress.localization.formatDate(new Date(), "HH:mm:ss"),
+            newItem = $("<li>").text([time, ajaxSettings.method, ajaxSettings.url, args].join(" "));
+
+        logList.prepend(newItem);
+    }
+</script>
+
+
+
+
+<script>
+    function exportToPDF() {
+        var doc = new jsPDF();
+        var dataGrid = $("#gridContainer").dxDataGrid("instance");
+        DevExpress.pdfExporter.exportDataGrid({
+            jsPDFDocument: doc,
+            component: dataGrid
+        }).then(function () {
+            doc.save("Facturas.pdf");
+        });
+    }
+</script>
+
+
+@* Script requeridos para exportar a PDF*@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.14/jspdf.plugin.autotable.min.js"></script>
+<script>
+    window.jsPDF = window.jspdf.jsPDF;
+    applyPlugin(window.jsPDF);
+</script>
+
+
+
+
+<script src="~/Scripts/sweetalert2.js"></script>
+
+<script src="@Url.Action("CldrData", "Facturacion", new { t = CldrDataScriptBuilder.GetCacheParam() })"></script>
+<script src="~/Scripts/devextreme/localization/dx.messages.es.js"></script>

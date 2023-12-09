@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DataSetReporteMensual" targetNamespace="http://tempuri.org/DataSetReporteMensual.xsd" xmlns:mstns="http://tempuri.org/DataSetReporteMensual.xsd" xmlns="http://tempuri.org/DataSetReporteMensual.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Web.config" AppSettingsPropertyName="TiendaConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="TiendaConnectionString (Web.config)" ParameterPrefix="@" PropertyReference="AppConfig.System.Configuration.ConfigurationManager.0.ConnectionStrings.TiendaConnectionString.ConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="UsuarioTableAdapter" GeneratorDataComponentClassName="UsuarioTableAdapter" Name="Usuario" UserDataComponentName="UsuarioTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="TiendaConnectionString (Web.config)" DbObjectName="Tienda.dbo.Usuario" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT        U.Nombre AS NombreCliente, SUM(DP.Subtotal) AS MontoTotalPedidos
+FROM            Usuario AS U INNER JOIN
+                         Pedido AS P ON U.IDUsuario = P.IDUsuario INNER JOIN
+                         DetallePedido AS DP ON P.IDPedido = DP.IDPedido
+WHERE        (MONTH(P.FechaPedido) = MONTH(GETDATE())) AND (YEAR(P.FechaPedido) = YEAR(GETDATE()))
+GROUP BY U.Nombre</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="NombreCliente" DataSetColumn="NombreCliente" />
+              <Mapping SourceColumn="MontoTotalPedidos" DataSetColumn="MontoTotalPedidos" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="CategoriaTableAdapter" GeneratorDataComponentClassName="CategoriaTableAdapter" Name="Categoria" UserDataComponentName="CategoriaTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="TiendaConnectionString (Web.config)" DbObjectName="Tienda.dbo.Categoria" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT
+    C.NombreCategoria AS Categoria,
+    SUM(DP.Subtotal) AS TotalVentas
+FROM
+    Categoria AS C
+INNER JOIN
+    Producto AS P ON C.IDCategoria = P.IDCategoria
+INNER JOIN
+    DetallePedido AS DP ON P.IDProducto = DP.IDProducto
+INNER JOIN
+    Pedido AS Pe ON DP.IDPedido = Pe.IDPedido
+WHERE
+    MONTH(Pe.FechaPedido) = MONTH(GETDATE()) AND YEAR(Pe.FechaPedido) = YEAR(GETDATE())
+GROUP BY
+    C.NombreCategoria</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Categoria" DataSetColumn="Categoria" />
+              <Mapping SourceColumn="TotalVentas" DataSetColumn="TotalVentas" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="RolUsuarioTableAdapter" GeneratorDataComponentClassName="RolUsuarioTableAdapter" Name="RolUsuario" UserDataComponentName="RolUsuarioTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="TiendaConnectionString (Web.config)" DbObjectName="Tienda.dbo.RolUsuario" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT
+    R.Rol AS RolUsuario,
+    COUNT(U.IDUsuario) AS CantidadUsuarios
+FROM RolUsuario R
+LEFT JOIN Usuario U ON R.RoleID = U.RoleID
+GROUP BY R.Rol</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="RolUsuario" DataSetColumn="RolUsuario" />
+              <Mapping SourceColumn="CantidadUsuarios" DataSetColumn="CantidadUsuarios" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="ProductoTableAdapter" GeneratorDataComponentClassName="ProductoTableAdapter" Name="Producto" UserDataComponentName="ProductoTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="TiendaConnectionString (Web.config)" DbObjectName="Tienda.dbo.Producto" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT TOP 5
+    P.NombreProducto AS Producto,
+    SUM(DP.Cantidad) AS TotalVendido
+FROM
+    Producto AS P
+INNER JOIN
+    DetallePedido AS DP ON P.IDProducto = DP.IDProducto
+INNER JOIN
+    Pedido AS Pe ON DP.IDPedido = Pe.IDPedido
+WHERE
+    MONTH(Pe.FechaPedido) = MONTH(GETDATE()) AND YEAR(Pe.FechaPedido) = YEAR(GETDATE())
+GROUP BY
+    P.NombreProducto
+ORDER BY
+    SUM(DP.Cantidad) DESC</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Producto" DataSetColumn="Producto" />
+              <Mapping SourceColumn="TotalVendido" DataSetColumn="TotalVendido" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="EstadoPedidoTableAdapter" GeneratorDataComponentClassName="EstadoPedidoTableAdapter" Name="EstadoPedido" UserDataComponentName="EstadoPedidoTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="TiendaConnectionString (Web.config)" DbObjectName="Tienda.dbo.EstadoPedido" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT
+    EP.Detalle AS Estado,
+    COUNT(P.IDPedido) AS CantidadPedidos
+FROM
+    EstadoPedido EP
+LEFT JOIN
+    Pedido P ON EP.EstadoID = P.EstadoID
+WHERE
+    P.FechaPedido &gt;= DATEADD(month, DATEDIFF(month, 0, GETDATE()), 0)
+    AND P.FechaPedido &lt; DATEADD(month, DATEDIFF(month, 0, GETDATE()) + 1, 0)
+GROUP BY
+    EP.Detalle</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Estado" DataSetColumn="Estado" />
+              <Mapping SourceColumn="CantidadPedidos" DataSetColumn="CantidadPedidos" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="DataSetReporteMensual" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="DataSetReporteMensual" msprop:Generator_UserDSName="DataSetReporteMensual">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Usuario" msprop:Generator_TableClassName="UsuarioDataTable" msprop:Generator_TableVarName="tableUsuario" msprop:Generator_TablePropName="Usuario" msprop:Generator_RowDeletingName="UsuarioRowDeleting" msprop:Generator_RowChangingName="UsuarioRowChanging" msprop:Generator_RowEvHandlerName="UsuarioRowChangeEventHandler" msprop:Generator_RowDeletedName="UsuarioRowDeleted" msprop:Generator_UserTableName="Usuario" msprop:Generator_RowChangedName="UsuarioRowChanged" msprop:Generator_RowEvArgName="UsuarioRowChangeEvent" msprop:Generator_RowClassName="UsuarioRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="NombreCliente" msprop:Generator_ColumnVarNameInTable="columnNombreCliente" msprop:Generator_ColumnPropNameInRow="NombreCliente" msprop:Generator_ColumnPropNameInTable="NombreClienteColumn" msprop:Generator_UserColumnName="NombreCliente">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="MontoTotalPedidos" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnMontoTotalPedidos" msprop:Generator_ColumnPropNameInRow="MontoTotalPedidos" msprop:Generator_ColumnPropNameInTable="MontoTotalPedidosColumn" msprop:Generator_UserColumnName="MontoTotalPedidos" type="xs:decimal" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Categoria" msprop:Generator_TableClassName="CategoriaDataTable" msprop:Generator_TableVarName="tableCategoria" msprop:Generator_TablePropName="Categoria" msprop:Generator_RowDeletingName="CategoriaRowDeleting" msprop:Generator_RowChangingName="CategoriaRowChanging" msprop:Generator_RowEvHandlerName="CategoriaRowChangeEventHandler" msprop:Generator_RowDeletedName="CategoriaRowDeleted" msprop:Generator_UserTableName="Categoria" msprop:Generator_RowChangedName="CategoriaRowChanged" msprop:Generator_RowEvArgName="CategoriaRowChangeEvent" msprop:Generator_RowClassName="CategoriaRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Categoria" msprop:Generator_ColumnVarNameInTable="columnCategoria" msprop:Generator_ColumnPropNameInRow="Categoria" msprop:Generator_ColumnPropNameInTable="CategoriaColumn" msprop:Generator_UserColumnName="Categoria">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TotalVentas" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnTotalVentas" msprop:Generator_ColumnPropNameInRow="TotalVentas" msprop:Generator_ColumnPropNameInTable="TotalVentasColumn" msprop:Generator_UserColumnName="TotalVentas" type="xs:decimal" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="RolUsuario" msprop:Generator_TableClassName="RolUsuarioDataTable" msprop:Generator_TableVarName="tableRolUsuario" msprop:Generator_TablePropName="RolUsuario" msprop:Generator_RowDeletingName="RolUsuarioRowDeleting" msprop:Generator_RowChangingName="RolUsuarioRowChanging" msprop:Generator_RowEvHandlerName="RolUsuarioRowChangeEventHandler" msprop:Generator_RowDeletedName="RolUsuarioRowDeleted" msprop:Generator_UserTableName="RolUsuario" msprop:Generator_RowChangedName="RolUsuarioRowChanged" msprop:Generator_RowEvArgName="RolUsuarioRowChangeEvent" msprop:Generator_RowClassName="RolUsuarioRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="RolUsuario" msprop:Generator_ColumnVarNameInTable="columnRolUsuario" msprop:Generator_ColumnPropNameInRow="RolUsuario" msprop:Generator_ColumnPropNameInTable="RolUsuarioColumn" msprop:Generator_UserColumnName="RolUsuario" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CantidadUsuarios" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnCantidadUsuarios" msprop:Generator_ColumnPropNameInRow="CantidadUsuarios" msprop:Generator_ColumnPropNameInTable="CantidadUsuariosColumn" msprop:Generator_UserColumnName="CantidadUsuarios" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Producto" msprop:Generator_TableClassName="ProductoDataTable" msprop:Generator_TableVarName="tableProducto" msprop:Generator_TablePropName="Producto" msprop:Generator_RowDeletingName="ProductoRowDeleting" msprop:Generator_RowChangingName="ProductoRowChanging" msprop:Generator_RowEvHandlerName="ProductoRowChangeEventHandler" msprop:Generator_RowDeletedName="ProductoRowDeleted" msprop:Generator_UserTableName="Producto" msprop:Generator_RowChangedName="ProductoRowChanged" msprop:Generator_RowEvArgName="ProductoRowChangeEvent" msprop:Generator_RowClassName="ProductoRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Producto" msprop:Generator_ColumnVarNameInTable="columnProducto" msprop:Generator_ColumnPropNameInRow="Producto" msprop:Generator_ColumnPropNameInTable="ProductoColumn" msprop:Generator_UserColumnName="Producto">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="255" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TotalVendido" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnTotalVendido" msprop:Generator_ColumnPropNameInRow="TotalVendido" msprop:Generator_ColumnPropNameInTable="TotalVendidoColumn" msprop:Generator_UserColumnName="TotalVendido" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="EstadoPedido" msprop:Generator_TableClassName="EstadoPedidoDataTable" msprop:Generator_TableVarName="tableEstadoPedido" msprop:Generator_TablePropName="EstadoPedido" msprop:Generator_RowDeletingName="EstadoPedidoRowDeleting" msprop:Generator_RowChangingName="EstadoPedidoRowChanging" msprop:Generator_RowEvHandlerName="EstadoPedidoRowChangeEventHandler" msprop:Generator_RowDeletedName="EstadoPedidoRowDeleted" msprop:Generator_UserTableName="EstadoPedido" msprop:Generator_RowChangedName="EstadoPedidoRowChanged" msprop:Generator_RowEvArgName="EstadoPedidoRowChangeEvent" msprop:Generator_RowClassName="EstadoPedidoRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Estado" msprop:Generator_ColumnVarNameInTable="columnEstado" msprop:Generator_ColumnPropNameInRow="Estado" msprop:Generator_ColumnPropNameInTable="EstadoColumn" msprop:Generator_UserColumnName="Estado" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CantidadPedidos" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnCantidadPedidos" msprop:Generator_ColumnPropNameInRow="CantidadPedidos" msprop:Generator_ColumnPropNameInTable="CantidadPedidosColumn" msprop:Generator_UserColumnName="CantidadPedidos" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

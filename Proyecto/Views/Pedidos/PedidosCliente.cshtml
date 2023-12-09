@@ -1,0 +1,248 @@
+﻿
+
+@{
+    ViewBag.Title = "PedidosCliente";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="text-white text-center">Pedidos del usuario</h1>
+
+
+
+
+
+
+@(Html.DevExtreme().DataGrid<Proyecto.Models.Pedido>()
+    .ID("gridContainer")
+    .DataSource(d => d.WebApi()
+        .RouteName("Pedidos")
+        .LoadAction("Listarporusuario")
+        .Key("IDPedido")
+        .OnBeforeSend("beforeSend")
+    .LoadParams(new { idUsuario = ViewBag.id })
+    )
+
+    .ShowBorders(true)
+    .OnInitialized("onLoading")
+    .SearchPanel(searchPanel => searchPanel.Visible(true))
+    .ColumnHidingEnabled(true)
+    .Paging(p => p.PageSize(5))
+    .Pager(pager =>
+    {
+        pager.Visible(true);
+        pager.ShowPageSizeSelector(true);
+        pager.AllowedPageSizes(new JS("[5, 10, 25, 50, 'all']"));
+        pager.ShowInfo(true);
+        pager.ShowNavigationButtons(true);
+    })
+    .FilterRow(f => f.Visible(true))
+    .HeaderFilter(f => f.Visible(true))
+    .GroupPanel(p => p.Visible(true))
+    .Grouping(g => g.AutoExpandAll(false))
+    .RemoteOperations(true)
+    .Editing(e => e
+        .Mode(GridEditMode.Popup)
+        .RefreshMode(GridEditRefreshMode.Reshape)
+        .UseIcons(true)
+
+        )
+     .Columns(columns =>
+     {
+
+         columns.AddFor(m => m.IDPedido).Alignment(HorizontalAlignment.Center).AllowEditing(false);
+         columns.AddFor(m => m.FechaPedido).Alignment(HorizontalAlignment.Center).AllowEditing(false);
+         columns.AddFor(m => m.EstadoID).Alignment(HorizontalAlignment.Center)
+          .Width(200)
+          .Lookup(lookup => lookup
+              .DataSource(w => w.WebApi().RouteName("EstadoPedido").LoadAction("Listar").Key("EstadoID"))
+              .DisplayExpr("Detalle")
+              .ValueExpr("EstadoID")
+          );
+         columns.Add().Type(GridCommandColumnType.Buttons)
+                         .Width(110).Buttons(b => b.Add().Hint("Factura").Icon("print").OnClick("generarFactura"));
+
+
+     })
+    .Export(e => e.Enabled(true).AllowExportSelectedData(true))
+    .OnExporting("exportToPDF")
+    .Selection(s => s.Mode(SelectionMode.Multiple))
+
+    .MasterDetail(md => {
+    md.Enabled(true);
+    md.Template(@<text>
+            <div class="master-detail-caption"> Detalle del pedido # <%- data.IDPedido %> </div>
+            @(Html.DevExtreme().DataGrid<Proyecto.Models.DetallePedido>()
+                        .ColumnAutoWidth(true)
+                        .ShowBorders(true)
+                        .Columns(columns =>
+                        {
+                            columns.AddFor(m => m.IDPedido);
+
+                            columns.AddFor(m => m.Producto.NombreProducto);
+
+                            columns.AddFor(m => m.Cantidad);
+
+                            columns.AddFor(m => m.PrecioUnitario);
+
+                            columns.AddFor(m => m.Subtotal);
+
+
+                        })
+                        .Summary(s => s.TotalItems(totalItems =>
+                        {
+                            totalItems.AddFor(m => m.Cantidad)
+                                .SummaryType(SummaryType.Sum)
+                                .DisplayFormat("Total de productos: {0}");
+                            totalItems.AddFor(m => m.Subtotal).SummaryType(SummaryType.Sum)
+                            .DisplayFormat("Costo total: {0}");
+                        }))
+                        .DataSource(d => d.WebApi()
+                            .RouteName("DetallePedido")
+                            .LoadAction("ListarporPedido")
+                            .LoadParams(new { id = new JS("data.IDPedido") })
+                        )
+            )
+
+        </text>);
+    })
+
+
+)
+
+
+
+
+<script>
+    function onLoading(e) {
+        Swal.fire({
+            title: 'Atención',
+            text: 'Cargando Facturas',
+            icon: 'success',
+            timerProgressBar: true,
+            showConfirmButton: false,
+            position: 'center',
+            timer: 1000
+        });
+    }
+    function beforeSend(operation, ajaxSettings) {
+        var data = ajaxSettings.data || {},
+            args = Object.keys(data).map(function (key) {
+                return key + "=" + data[key];
+            }).join(" ");
+
+        var logList = $("#requests ul"),
+            time = DevExpress.localization.formatDate(new Date(), "HH:mm:ss"),
+            newItem = $("<li>").text([time, ajaxSettings.method, ajaxSettings.url, args].join(" "));
+
+        logList.prepend(newItem);
+    }
+</script>
+
+
+
+
+<script>
+    function exportToPDF() {
+        var doc = new jsPDF();
+        var dataGrid = $("#gridContainer").dxDataGrid("instance");
+        DevExpress.pdfExporter.exportDataGrid({
+            jsPDFDocument: doc,
+            component: dataGrid
+        }).then(function () {
+            doc.save("Pedidos.pdf");
+        });
+    }
+</script>
+
+
+@* Script requeridos para exportar a PDF*@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.14/jspdf.plugin.autotable.min.js"></script>
+<script>
+    window.jsPDF = window.jspdf.jsPDF;
+    applyPlugin(window.jsPDF);
+</script>
+
+
+
+<style>
+    #gridContainer {
+        height: 440px;
+    }
+
+    .master-detail-caption {
+        padding: 0 0 5px 10px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+</style>
+
+
+<script src="~/Scripts/sweetalert2.js"></script>
+
+<script src="@Url.Action("CldrData", "Usuarios", new { t = CldrDataScriptBuilder.GetCacheParam() })"></script>
+<script src="~/Scripts/devextreme/localization/dx.messages.es.js"></script>
+
+
+
+<script>
+    function generarFactura(e) {
+        var pedidoID = e.row.data.IDPedido;
+
+        Swal.fire({
+            title: 'Generando factura',
+            text: 'Procesando pago...',
+            icon: 'info',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch('/Pedidos/ReportePedidos?idpedido=' + pedidoID)
+            .then(response => response.blob())
+            .then(blob => {
+                // Crear un objeto URL del blob
+                const url = window.URL.createObjectURL(new Blob([blob]));
+
+                Swal.fire({
+                    title: 'Atención',
+                    text: 'Factura descargada',
+                    icon: 'success',
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    position: 'center',
+                    timer: 1000
+                });
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Factura.pdf';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+
+
+            })
+            .catch(error => {
+                // Manejar errores si la solicitud falla
+                console.error('Error al generar factura:', error);
+                Swal.fire({
+                    title: 'Peligro',
+                    text: 'Factura no pudo ser generada',
+                    icon: 'error',
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    position: 'center',
+                    timer: 3000,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                });
+            });
+    }
+</script>

@@ -1,0 +1,110 @@
+﻿@model Proyecto.Models.Usuario
+
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+
+
+
+<div class="container-fluid d-flex justify-content-center align-items-center">
+    <div class="w-50 p-3 border">
+
+        <div style="display:flex; justify-content:center; align-items:center">
+            <img src="~/ImagenesWeb/LogoBanner.png" style="width: 300px; height: 200px;">
+
+        </div>
+
+        @if (ViewBag.mensaje!=null)
+        {
+           <h2 style="color:red; text-align:center" >@ViewBag.mensaje</h2>
+        }
+
+        @using (Html.BeginForm("Login", "Acceso", FormMethod.Post))
+        {
+
+            using (Html.DevExtreme().ValidationGroup())
+            {
+
+                @Html.AntiForgeryToken()
+
+                @(Html.DevExtreme().Form<Proyecto.Models.Usuario>()
+                .ShowValidationSummary(true)
+
+                .Items(items => {
+
+                    items.AddGroup()
+                        .Caption("Inicie Sesion en la aplicacion o registrese").AlignItemLabels(true).CssClass("text-center")
+                        .Items(groupItems => {
+                            groupItems.AddSimpleFor(m => m.CorreoElectronico)
+                            .Editor(e => e.TextBox()
+                            .ID("correo").Name("correo")
+                            );
+
+
+
+                            groupItems.AddSimpleFor(m => m.Contraseña)
+                                   .Editor(e => e.TextBox()
+                                       .ID("password")
+
+                                       .InputAttr("aria-label", "Password")
+                                       .Placeholder("Contraseña")
+                                       .Mode(TextBoxMode.Password)
+                                       .StylingMode(EditorStylingMode.Filled)
+                                       .Buttons(buttons =>
+                                       {
+                                           buttons.Add()
+                                               .Name("password")
+                                               .Location(TextEditorButtonLocation.After)
+                                               .Widget(w => w.Button()
+                                                   .Type(ButtonType.Default)
+                                                   .Icon(Url.Content("~/Content/Images/eye.png"))
+                                                   .OnClick("changePasswordMode"));
+                                       })
+                                   );
+
+                        });
+                    items.AddButton()
+                        .HorizontalAlignment(HorizontalAlignment.Left)
+                        .ButtonOptions(b => b.Text("Ingresar")
+                        .UseSubmitBehavior(true)
+                        .Type(ButtonType.Success)
+                        .Icon("user")
+                    );
+
+                    items.AddButton()
+                        .HorizontalAlignment(HorizontalAlignment.Center)
+                        .ButtonOptions(b => b.Text("Registrarse")
+                        .ID("btnRegistrarse")
+                        .Type(ButtonType.Default)
+                        .Icon("back")
+                    );
+                })
+                .FormData(Model)
+
+            )
+            }
+        }
+    </div>
+
+</div>
+
+
+<script>
+    function changePasswordMode() {
+        var passwordEditor = $("#password").dxTextBox("instance");
+        passwordEditor.option("mode", passwordEditor.option("mode") === "text" ? "password" : "text");
+
+    }
+</script>
+
+<script>
+    $(function () {
+        $("#btnRegistrarse").dxButton("instance").option("onClick", function (e) {
+            // Realizar la redirección a la URL deseada
+            window.location.href = "@Url.Action("Registro", "Acceso")"; // Reemplaza con la URL a la que deseas redirigir
+        });
+    });
+</script>
+

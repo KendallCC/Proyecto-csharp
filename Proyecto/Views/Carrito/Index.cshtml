@@ -1,0 +1,167 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+
+<a href="@Url.Action("Index","Home")" class="btn btn-outline-secondary align-content-center m-2">Regresar</a>
+
+<div class="carrito-container">
+    <h2 class="text-center" style="color: #b2b4b2">Carrito de compras</h2>
+    @(Html.DevExtreme().DataGrid<Proyecto.Models.Carrito>()
+            .ID("gridContainer")
+            .DataSource(d => d.WebApi()
+        .RouteName("Carritos")
+        .LoadAction("Listar")
+        .UpdateAction("Actualizar")
+        .DeleteAction("Borrar")
+        .Key("IDCarrito")
+        .OnBeforeSend("beforeSend")
+        .OnUpdated("onUpdated")
+        .OnRemoved("onRemoving")
+        .LoadParams(new { idUsuario = ViewBag.idUsuario }))
+            .Paging(p => p.PageSize(10))
+            .Pager(p => p
+                .ShowPageSizeSelector(true)
+                .AllowedPageSizes(new[] { 10, 25, 50, 100 })
+            )
+            .ShowBorders(true)
+            .OnInitialized("onLoading")
+            .RepaintChangesOnly(true)
+            .Scrolling(s => s.Mode(GridScrollingMode.Virtual))
+            .Editing(e => e
+                .Mode(GridEditMode.Popup)
+                .RefreshMode(GridEditRefreshMode.Reshape)
+                .AllowDeleting(true)
+                .AllowUpdating(true)
+                .UseIcons(true)
+                .Form(form => {
+                    form.Items(items =>
+                    {
+                        items.AddSimple().DataField("Producto.NombreProducto");
+                        items.AddSimple().DataField("Cantidad");
+                    });
+                })
+            )
+            .Columns(columns =>
+            {
+                columns.AddFor(m => m.Producto.NombreProducto).AllowEditing(false);
+                columns.AddFor(m => m.Cantidad).DataType(GridColumnDataType.Number);
+                columns.AddFor(m => m.Producto.Precio).AllowEditing(false);
+                columns.AddFor(m => m.Total).AllowEditing(false);
+
+
+            })
+            .Summary(s => s.TotalItems(items =>
+            {
+
+                items.AddFor(m => m.Total)
+                    .SummaryType(SummaryType.Sum)
+                    .ValueFormat("#,##0.##");
+
+            }))
+       )
+
+
+
+
+</div>
+
+
+
+@{if (ViewBag.hascarrito)
+    {
+        <div class="pagar-container">
+            <a class="btn btn-info pagar-btn p-3" href="@Url.Action("Index","Pagos")">Pagar</a>
+        </div> }
+    else
+    {
+        <div class="pagar-container">
+            <a class="btn btn-info pagar-btn p-3" href="@Url.Action("Index","Home")">Comprar</a>
+        </div> }
+}
+
+
+
+
+
+
+<style>
+
+    .pagar-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+
+
+</style>
+
+
+
+
+<script>
+
+
+    function onUpdated(e) {
+        Swal.fire({
+            title: 'Modificacion',
+            text: 'Se ha modificado un producto del carrito',
+            icon: 'info',
+            timerProgressBar: true,
+            showConfirmButton: false,
+            position: 'center',
+            timer: 1500
+        });
+    }
+
+    function onRemoving(e) {
+        Swal.fire({
+            title: 'Eliminacion',
+            text: 'Se ha Eliminado un Producto del carrito',
+            icon: 'warning',
+            timerProgressBar: true,
+            showConfirmButton: false,
+            position: 'center',
+            timer: 1500
+        });
+    }
+
+
+    function onLoading(e) {
+        Swal.fire({
+            title: 'Atención',
+            text: 'Cargando Carrito',
+            icon: 'success',
+            timerProgressBar: true,
+            showConfirmButton: false,
+            position: 'Center',
+            timer: 1000
+        });
+    }
+
+    function beforeSend(operation, ajaxSettings) {
+        var data = ajaxSettings.data || {},
+            args = Object.keys(data).map(function (key) {
+                return key + "=" + data[key];
+            }).join(" ");
+
+        var logList = $("#requests ul"),
+            time = DevExpress.localization.formatDate(new Date(), "HH:mm:ss"),
+            newItem = $("<li>").text([time, ajaxSettings.method, ajaxSettings.url, args].join(" "));
+
+        logList.prepend(newItem);
+    }
+</script>
+
+
+
+<script src="~/Scripts/sweetalert2.js"></script>
+
+<script src="@Url.Action("CldrData", "Carrito", new { t = CldrDataScriptBuilder.GetCacheParam() })"></script>
+<script src="~/Scripts/devextreme/localization/dx.messages.es.js"></script>
+

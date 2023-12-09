@@ -1,0 +1,164 @@
+﻿@model IEnumerable<Proyecto.Models.Producto>
+
+@{
+    ViewBag.Title = "Catálogo de Productos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="container">
+    <div class="jumbotron" style="background-color: #11111f; padding: 1rem;">
+        <div class="text-center text-white">
+            <h1 class="display-4 text-white">Catálogo de Productos</h1>
+            <p class="lead">Aquí encontrarás los mejores productos que TechStore tiene para ofrecer.</p>
+        </div>
+    </div>
+
+    <div class="container-sm d-flex justify-content-center align-items-center">
+        @(Html.DevExtreme().Gallery()
+        .ID("gallery")
+        .DataSource(new string[]{ "/ImagenesWeb/LogoBanner.png", "/ImagenesWeb/entregaDomicilio.jpg", "/ImagenesWeb/compraTodoCamion.png" })
+        .Height(300)
+        .Width(500)
+        .Loop(true)
+        .SlideshowDelay(2000)
+        .ShowNavButtons(true)
+        .ShowIndicator(true)
+    )
+    </div>
+
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <form id="filtroCategoriasForm">
+                <div class="form-group">
+                    <label for="categoria" class="text-white">Filtrar por categoría:</label>
+                    <select id="categoria" class="form-control">
+                        <option value="">Todas las categorías</option>
+                        @foreach (var categoria in ViewBag.categorias)
+                        {
+                            <option value="@categoria.IDCategoria">@categoria.NombreCategoria</option>
+                        }
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </form>
+        </div>
+    </div>
+
+
+    @if (ViewData["Descripcion"]!=null)
+    {
+        <h2 class="text-white text-center">@ViewData["Descripcion"]</h2>    
+    }
+
+<div class="row">
+    @foreach (var product in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="@product.Imagen" class="card-img-top" alt="Producto Image">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        <i class="dx-icon-product mr-2"></i> <span class="text-primary font-weight-bold">@product.NombreProducto</span>
+</h5>
+                    <p class="card-text font-weight-bold">@product.DescripcionProducto</p>
+                    <p class="card-text font-weight-bold">Precio: <span class="text-primary">@product.Precio.ToString("C2")</span></p>
+                    <button class="btn btn-primary addToCartBtn" data-product-id="@product.IDProducto" onclick="agregarAlCarrito(@product.IDProducto, this)">
+                        <i class="dx-icon-cart"></i> Agregar al Carrito
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+</div>
+
+
+<script>
+    // Función para agregar un producto al carrito utilizando AJAX
+    function agregarAlCarrito(productoId, button) {
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("AgregarAlCarrito", "Home")",
+            data: { productoId: productoId, cantidad: 1 },
+            success: function (response) {
+                // Cambia el color y el texto del botón
+                button.classList.add('clicked');
+                button.textContent = 'Agregado';
+
+                // Deshabilita el botón para evitar agregar más de una vez
+                button.disabled = true;
+
+                Swal.fire({
+                    title: 'Atención',
+                    text: 'Agregado con éxito',
+                    icon: 'success',
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    position: 'center',
+                    timer: 1000
+                });
+                console.log(response);
+            },
+            error: function (error) {
+                Swal.fire({
+                    title: 'Atención',
+                    text: 'Algo ha salido mal',
+                    icon: 'error',
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    position: 'center',
+                    timer: 1000
+                });
+                console.error(error);
+            }
+        });
+    }
+</script>
+
+<style>
+    .addToCartBtn {
+        background-color: #007bff;
+        color: #fff;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+        .addToCartBtn.clicked {
+            background-color: #28a745;
+        }
+</style>
+
+<script src="~/Scripts/sweetalert2.js"></script>
+
+<script src="@Url.Action("CldrData", "Home", new { t = CldrDataScriptBuilder.GetCacheParam() })"></script>
+<script src="~/Scripts/devextreme/localization/dx.messages.es.js"></script>
+
+
+
+<script>
+    $(document).ready(function () {
+    // Capturar el envío del formulario de filtro
+    $('#filtroCategoriasForm').submit(function (event) {
+        // No es necesario evitar el comportamiento predeterminado de envío del formulario aquí
+        var categoriaSeleccionada = $('#categoria').val(); // Obtener el valor de la categoría seleccionada
+
+        // Realizar una solicitud AJAX al servidor para filtrar los productos por categoría
+        $.ajax({
+            type: "GET",
+            url: "@Url.Action("Index", "Home")",
+            data: { categoriaSeleccionada: categoriaSeleccionada },
+            success: function (response) {
+                // Recargar la página con los productos filtrados
+                window.location.href = "@Url.Action("Index", "Home")?categoriaSeleccionada=" + categoriaSeleccionada;
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+        // Evitar el comportamiento predeterminado de envío del formulario
+        event.preventDefault();
+    });
+});
+</script>

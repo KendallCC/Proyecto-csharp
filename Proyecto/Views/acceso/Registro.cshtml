@@ -1,0 +1,104 @@
+﻿
+@{
+    ViewBag.Title = "Registro";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+
+
+@if (ViewData["messager"]!=null)
+{
+<h2 class="text-danger text-center">@ViewData["messager"]</h2>
+}
+
+<div class="container-fluid d-flex justify-content-center align-items-center">
+    <div class="w-50 p-3 border">
+        @using (Html.BeginForm("Registrar","Acceso",FormMethod.Post))
+        {
+            using (Html.DevExtreme().ValidationGroup())
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="text-center">
+                    <img src="~/Content/images/avatar.png" width="75" height="75" class="img-fluid rounded-circle">
+                </div>
+
+                @(Html.DevExtreme().Form<Proyecto.Models.Usuario>()
+                    .ShowValidationSummary(true)
+                    .Items(items => {
+                        items.AddGroup()
+                            .Caption("Formulario de Registro").AlignItemLabels(true).CssClass("text-center")
+                            .Items(groupItems => {
+                                groupItems.AddSimpleFor(m => m.Nombre).Editor(e=>e.TextBox().Placeholder("Nombre"));
+                                groupItems.AddSimpleFor(m => m.CorreoElectronico).Editor(e => e.TextBox().Placeholder("Correo Electronico"));
+
+
+
+                                groupItems.AddSimpleFor(m => m.Contraseña)
+                                    .Editor(e => e.TextBox()
+                                        .ID("password")
+
+                                        .InputAttr("aria-label", "Password")
+                                        .Placeholder("Contraseña")
+                                        .Mode(TextBoxMode.Password)
+                                        .StylingMode(EditorStylingMode.Filled)
+                                        .Buttons(buttons =>
+                                        {
+                                            buttons.Add()
+                                                .Name("password")
+                                                .Location(TextEditorButtonLocation.After)
+                                                .Widget(w => w.Button()
+                                                    .Type(ButtonType.Default)
+                                                    .Icon(Url.Content("~/Content/Images/eye.png"))
+                                                    .OnClick("changePasswordMode"));
+                                        })
+                                    );
+
+                                groupItems.AddSimpleFor(m => m.confirmarContraseña)
+                                    .Editor(e => e.TextBox()
+                                        .ID("conpassword")
+
+                                        .InputAttr("aria-label", "Password")
+                                        .Placeholder("Contraseña")
+                                        .Mode(TextBoxMode.Password)
+                                        .StylingMode(EditorStylingMode.Filled)
+                                        .Buttons(buttons =>
+                                        {
+                                            buttons.Add()
+                                                .Name("password")
+                                                .Location(TextEditorButtonLocation.After)
+                                                .Widget(w => w.Button()
+                                                    .Type(ButtonType.Default)
+                                                    .Icon(Url.Content("~/Content/Images/eye.png"))
+                                                    .OnClick("changePasswordMode"));
+                                        })
+
+                                    );
+                            });
+
+                        items.AddButton()
+                            .HorizontalAlignment(HorizontalAlignment.Left)
+                            .ButtonOptions(b => b.Text("Registrar")
+                                .Type(ButtonType.Success)
+                                .UseSubmitBehavior(true)
+                            );
+
+                    })
+                    .FormData(Model)
+                )
+            }
+        }
+    </div>
+</div>
+
+
+
+<script>
+    function changePasswordMode() {
+        var passwordEditor = $("#password").dxTextBox("instance");
+        passwordEditor.option("mode", passwordEditor.option("mode") === "text" ? "password" : "text");
+
+        var passwordEditor = $("#conpassword").dxTextBox("instance");
+        passwordEditor.option("mode", passwordEditor.option("mode") === "text" ? "password" : "text");
+
+    }
+</script>

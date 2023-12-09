@@ -1,0 +1,85 @@
+﻿@{
+    ViewBag.Title = "GraficoVentas";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+}
+
+<div class="container mt-4 mb-4 d-flex justify-content-center align-items-center flex-column">
+    <div class="alert" role="alert">
+        <h4 class="text-center text-white" style="font-size: 2rem">Reporte mensual</h4>
+    </div>
+    <button id="descargarReporteBtn" class="btn btn-primary btn-block" style="font-size:2rem">
+        <i class="dx-icon-inf"></i> Descargar Reporte
+    </button>
+</div>
+
+
+<div id="chartUsuariosFacturas"></div>
+
+
+@section scripts {
+    <script>
+        // Gráfico de pastel (Cantidad de Usuarios y Facturas)
+        var cantidadUsuarios = @ViewBag.CantidadUsuarios;
+        var cantidadFacturas = @ViewBag.CantidadFacturas;
+
+        var dataSource = [
+            { estado: "Usuarios", cantidad: cantidadUsuarios },
+            { estado: "Facturas", cantidad: cantidadFacturas }
+        ];
+
+        $("#chartUsuariosFacturas").dxPieChart({
+            dataSource: dataSource,
+            series: {
+                argumentField: "estado",
+                valueField: "cantidad",
+                label: {
+                    visible: true,
+                    connector: {
+                        visible: true
+                    }
+                }
+            },
+            title: "Cantidad de Usuarios y Facturas en el Mes",
+            legend: {
+                horizontalAlignment: "center",
+                verticalAlignment: "bottom"
+            },
+            export: {
+                enabled: true,
+                formats: ["PNG", "JPEG", "SVG", "PDF"]
+            }
+        });
+        //fin del grafico pastel
+
+
+
+        // Agregar evento clic al botón
+        document.getElementById('descargarReporteBtn').addEventListener('click', function() {
+            // Realizar la petición al controlador para descargar el reporte
+            fetch('@Url.Action("ReporteMensual", "Facturacion")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json' // Ajusta si es necesario
+                }
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                // Crear un enlace para descargar el archivo y simular clic para descargarlo
+                const url = window.URL.createObjectURL(new Blob([blob]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'reporte_mensual.pdf');
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            })
+            .catch(error => {
+                console.error('Error al descargar el reporte:', error);
+            });
+        });
+
+
+
+
+    </script>
+}

@@ -1,0 +1,114 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<a href="@Url.Action("Index","Carrito")" class="btn btn-secondary align-content-center mb-2">Regresar al carrito</a>
+
+
+@using (Html.BeginForm("Cancelar", "Pagos", FormMethod.Post, new { id = "paymentForm" }))
+{
+
+    using (Html.DevExtreme().ValidationGroup())
+    {
+
+        @Html.AntiForgeryToken()
+
+        @(Html.DevExtreme().Form<Proyecto.Models.Tarjeta>()
+            .ShowValidationSummary(true)
+
+            .Items(items => {
+
+                items.AddGroup()
+                    .Caption("Tarjeta de Credito Visa o Mastercard")
+                    .Items(groupItems => {
+                        groupItems.AddSimpleFor(m => m.numeracion)
+                        .Editor(e => e.TextBox()
+                        .Mask("0000-0000-0000-0000")
+                        ).Name("numeracion");
+
+                        groupItems.AddSimpleFor(m => m.FechaVencimiento)
+                            .Editor(e => e.DateBox()
+                            .Min(DateTime.Today)
+                            .Max(DateTime.Now.AddYears(5)).Value(DateTime.Today)
+                            ).Name("FechaVencimiento");
+
+                        groupItems.AddSimpleFor(m => m.Seguridad).Name("Seguridad");
+                    });
+                items.AddButton()
+                    .HorizontalAlignment(HorizontalAlignment.Left)
+                    .ButtonOptions(b => b.Text("Confirmar Pago")
+                    .Type(ButtonType.Success)
+                    .UseSubmitBehavior(true)
+                );
+
+            })
+            .FormData(Model)
+
+        )
+    }
+}
+
+
+
+
+
+
+
+
+<script src="~/Scripts/sweetalert2.js"></script>
+<script src="@Url.Action("CldrData", "Pagos", new { t = CldrDataScriptBuilder.GetCacheParam() })"></script>
+<script src="~/Scripts/devextreme/localization/dx.messages.es.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#paymentForm').submit(function (e) {
+            e.preventDefault(); // Previene el envío por defecto del formulario
+
+            // Mostrar Sweet Alert indicando "Generando factura"
+            Swal.fire({
+                title: 'Generando factura',
+                text: 'Procesando pago...',
+                icon: 'info',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+
+            var formData = $(this).serialize(); // Obtener datos del formulario
+
+            // Enviar los datos del formulario al servidor usando AJAX
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Cancelar", "Pagos")',
+                data: formData,
+                success: function (response) {
+                    // Manejar la respuesta exitosa del servidor
+                    Swal.fire({
+                        title: 'Éxito',
+                        text: 'Pago procesado exitosamente',
+                        icon: 'success'
+                    }).then(function () {
+                        // Redireccionar a la página de Pedidos
+                        window.location.href = '@Url.Action("PedidosCliente", "Pedidos")';
+                    });
+                },
+                error: function () {
+                    // Manejar errores del servidor
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Error al procesar el pago',
+                        icon: 'error'
+                    });
+                }
+            });
+        });
+    });
+</script>

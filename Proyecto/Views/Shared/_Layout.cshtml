@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Responsive Bootstrap 4 Admin &amp; Dashboard Template">
+    <meta name="author" content="Bootlab">
+
+    <title>@ViewData["Title"]</title>
+    <link href="~/Content/classic.css" rel="stylesheet" />
+    <style>
+        body {
+            opacity: 0;
+        }
+    </style>
+    <script src="~/Scripts/site.js"></script>
+    @*<link rel="stylesheet" href="~/Content/vendor.css" />*@
+    <link href="~/Content/Site2.css" rel="stylesheet" />
+    <link href="~/Content/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <script src="~/Scripts/chart.min.js" crossorigin="anonymous" type="text/javascript"></script>
+    <script src="~/Scripts/app.js" crossorigin="anonymous" rel="stylesheet"></script>
+    <script src="~/Scripts/dx-quill.min.js" crossorigin="anonymous" type="text/javascript"></script>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    @*<link rel="stylesheet" href="~/Content/vendor.css" />*@
+    <link rel="stylesheet" href="~/Content/Site2.css" />
+    <link rel="stylesheet" href="~/Content/thirdparty.bundle.css" />
+
+    <link href="~/Content/devextreme/bootstrap.css" rel="stylesheet" />
+    <link href="~/content/devextreme/dx.common.css" rel="stylesheet" />
+   
+    <link href="~/content/devextreme/dx.generic.CustomTheme.css" rel="stylesheet" />
+    @Styles.Render("~/Content/bundle")
+    @Styles.Render("~/Content/DevExtremeBundle")
+    @Scripts.Render("~/Scripts/DevExtremeBundle")
+
+</head>
+<body class="d-flex flex-column" style="background-color: #11111f">
+    <div class="wrapper flex-grow-1">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-content ">
+                <a class="sidebar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="align-content-between" data-feather="home"></i>
+                    <b><span style="color: #ffffff" class="align-content-center">Productos</span></b>
+                </a>
+
+                @{
+
+                    var role = Session["rol"] as string;
+
+                    var nombreusuario = Session["nombreusuario"] as string;
+
+                }
+
+
+                <ul class="sidebar-nav">
+
+
+                    @if (role == "Administrador")
+                    {
+                        <li class="sidebar-item">
+                            <a href="#catalogo" data-toggle="collapse" class="sidebar-link collapsed" aria-expanded="false">
+                                <i class="align-middle" data-feather="user"></i> <span class="align-middle">Administrativo</span>
+                            </a>
+                            <ul id="catalogo" class="sidebar-dropdown list-unstyled collapse" data-parent="#sidebar">
+                                <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("Index", "Roles")">Roles</a></li>
+                                <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("Index", "Usuarios")">Usuarios</a></li>
+                                <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("Index", "Pedidos")">Pedidos</a></li>
+                                <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("Index", "Facturacion")">Historial Facturas</a></li>
+                                <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("ReportePorFecha", "Facturacion")">Reporte Facturas</a></li>
+                                <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("GraficoVentas", "Facturacion")">Reporte Mensual</a></li>
+                            </ul>
+                        </li>
+                    }
+                    @if (role == "Empleados")
+                    {
+                        <li class="sidebar-item">
+                            <a href="#servicios" data-toggle="collapse" class="sidebar-link collapsed" aria-expanded="false">
+                                <i class="align-middle" data-feather="star"></i>
+                                <span class="align-middle">Actividades</span>
+                            </a>
+                            <ul id="servicios" class="sidebar-dropdown list-unstyled collapse" data-parent="#sidebar">
+                                <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("Index", "Categorias")">Categorias</a></li>
+                                <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("Index", "Productos")">Productos</a></li>
+                                <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("Index", "Pedidos")">Pedidos</a></li>
+                                <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("Index", "Facturacion")">Historial Facturas</a></li>
+                                <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("ReportePorFecha", "Facturacion")">Reporte Facturas</a></li>
+                            </ul>
+
+                        </li>
+                    }
+
+                    <li class="sidebar-item">
+                        <a href="#Catalogo" data-toggle="collapse" class="sidebar-link collapsed" aria-expanded="false">
+                            <i class="align-middle" data-feather="bookmark"></i>
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span class="align-middle">Catalogo</span>
+                        </a>
+
+                        <ul id="Catalogo" class="sidebar-dropdown list-unstyled collapse" data-parent="#sidebar">
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="@Url.Action("Index", "Home")">Catalogo</a>
+                            </li>
+
+                            <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("Index", "Carrito")">Ver Carrito</a></li>
+
+                            <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("PedidosCliente", "Pedidos")">Ver mis pedidos</a></li>
+
+                        </ul>
+                    </li>
+
+
+
+
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="@Url.Action("logout", "Acceso")">
+                            <i class="align-middle" data-feather="log-out"></i> <span class="align-middle">salir</span>
+                        </a>
+                    </li>
+
+
+
+
+                </ul>
+
+                <div class="sidebar-item ml-2 mb-5 d-none d-lg-block">
+                    <div class="media">
+                        <img class="rounded-circle mr-3" src="~/Content/images/img/avatars/avatarUsuario.png" width="40" height="40">
+                        <span class="align-middle lead text-success">@nombreusuario</span>
+                    </div>
+                </div>
+
+            </div>
+        </nav>
+
+        <div class="main" role="main">
+            <nav class="navbar navbar-expand navbar-light" style="background-color: #11111f">
+                <a class="sidebar-toggle d-flex mr-2">
+                    <i class="hamburger align-self-center"></i>
+                </a>
+                <img src="~/ImagenesWeb/LogoBanner.png" width="250" height="100" class="d-inline-block align-top" alt="">
+
+
+                <!-- #region Usuario y carrito -->
+                <div class="navbar-collapse collapse">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link d-none d-sm-inline-block" href="@Url.Action("Index", "Carrito")">
+                                <i class="align-middle dx-icon-cart text-white" style="font-size:2rem"></i> <span class="text-white">Carrito</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-none d-sm-inline-block" href="#">
+                                <i class="align-middle dx-icon-card text-white" style="font-size:2rem"></i> <span class="text-success">Conectado</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+
+
+
+
+            </nav>
+            <main role="main" class="content mb-5" style="background-color: #11111f">
+                <div class="container-fluid p-0">
+                    @RenderBody()
+                </div>
+            </main>
+            <footer class="footer fixed-bottom bg-dark">
+                <div class="container-fluid">
+                    <div class="row text-muted">
+                        <div class="col-6 text-left">
+                            <ul class="list-inline">
+                                
+                                <li class="list-inline-item">
+                                    <a class="text-white" href="#">Acerca de nosotros</a>
+                                </li>
+                                
+                                <li class="list-inline-item">
+                                    <a class="text-white" href="#">Creado por: Kendall Cespedes Castillo</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-6 text-right">
+                            <p class="mb-0 text-white">
+                                &copy; 2023 - <a href="http://www.utn.ac.cr" target="_blank" class="text-white">UTN ISW 711</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    @RenderSection("Scripts", false)
+</body>
+</html>
